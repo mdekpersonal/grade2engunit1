@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 2 English Unit 1 🌟</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="hero-section text-center py-5">
+        <div class="container">
+            <h1 class="display-3 mb-2 fw-bold text-primary">🏫 EXCELLENCE JUNIOR SCHOOL 🏫</h1>
+            <h2 class="display-5 mb-4 text-success fw-semibold">📖 THE B.Y.O.O METHOD 📖</h2>
+            <hr class="mx-auto mb-4" style="width: 60%; height: 3px; background: linear-gradient(45deg, #007bff, #28a745); border: none;">
+            <h3 class="display-4 mb-4">🌟 Grade 2 Unit 1: {{ content.lesson_title }} 🎉</h3>
+            <p class="lead">Let's learn about school items, numbers, and new words! 📚✨</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-5">
+        {% for section in content.sections %}
+        {% set section_index = loop.index0 %}
+        <section class="section-card mb-5" id="section-{{ section_index }}">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-header text-center mb-4">
+                        <h2 class="section-title">{{ section.title }}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards Carousel -->
+            {% if section.cards %}
+            <div class="carousel-container mb-5">
+                <h3 class="carousel-title">� Learning Cards</h3>
+                
+                <!-- Audio Controls -->
+                <div class="audio-controls text-center mb-3">
+                    <button class="btn btn-success btn-lg audio-btn" onclick="playAudio('section-{{ section_index }}-vocab')">
+                        <i class="fas fa-play"></i> Play Audio 🎵
+                    </button>
+                    <button class="btn btn-warning btn-lg audio-btn" onclick="pauseAudio('section-{{ section_index }}-vocab')">
+                        <i class="fas fa-pause"></i> Pause ⏸️
+                    </button>
+                    <button class="btn btn-danger btn-lg audio-btn" onclick="stopAudio('section-{{ section_index }}-vocab')">
+                        <i class="fas fa-stop"></i> Stop 🛑
+                    </button>
+                </div>
+
+                <div id="cardsCarousel{{ loop.index }}" class="carousel slide" data-bs-ride="false" data-bs-interval="false">
+                    <div class="carousel-indicators">
+                        {% for card in section.cards %}
+                        <button type="button" data-bs-target="#cardsCarousel{{ loop.index }}" 
+                                data-bs-slide-to="{{ loop.index - 1 }}" 
+                                {% if loop.first %}class="active"{% endif %}></button>
+                        {% endfor %}
+                    </div>
+                    <div class="carousel-inner">
+                        {% for card in section.cards %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            {% if "Practice Dialogue" in section.title %}
+                            <!-- Special layout for dialogue cards -->
+                            <div class="carousel-card dialogue-card">
+                                <div class="card-content">
+                                    <div class="emoji-display">{{ card.emoji }}</div>
+                                    <div class="dialogue-content">
+                                        {% if 'A:' in card.english_phrase and 'B:' in card.english_phrase %}
+                                            <!-- Parse dialogue exchanges -->
+                                            {% set dialogue_text = card.english_phrase %}
+                                            {% set parts = dialogue_text.replace('A:', '|A:').replace('B:', '|B:').split('|') %}
+                                            {% for part in parts %}
+                                                {% if part.strip() %}
+                                                    {% if part.strip().startswith('A:') %}
+                                                    <div class="dialogue-line speaker-a">
+                                                        <span class="speaker">A:</span> {{ part.replace('A:', '').strip() }}
+                                                    </div>
+                                                    {% elif part.strip().startswith('B:') %}
+                                                    <div class="dialogue-line speaker-b">
+                                                        <span class="speaker">B:</span> {{ part.replace('B:', '').strip() }}
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="dialogue-line speaker-a">
+                                                        <span class="speaker">A:</span> {{ part.strip() }}
+                                                    </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <!-- Fallback for non-dialogue format -->
+                                            <h4 class="english-phrase">{{ card.english_phrase }}</h4>
+                                        {% endif %}
+                                    </div>
+                            {% else %}
+                            <!-- Standard layout for regular cards -->
+                            <div class="carousel-card learning-card">
+                                <div class="card-content">
+                                    <div class="emoji-display">{{ card.emoji }}</div>
+                                    <h4 class="english-phrase">{{ card.english_phrase }}</h4>
+                            {% endif %}
+                                    <div class="word-controls">
+                                        <button class="btn btn-primary btn-lg" onclick="speakText('{{ card.english_phrase }}')">
+                                            🔊 Say it!
+                                        </button>
+                                        <button class="btn btn-info btn-lg mt-2" onclick="repeatText('{{ card.english_phrase }}')">
+                                            � Repeat!
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#cardsCarousel{{ loop.index }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#cardsCarousel{{ loop.index }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">🌟 Great job learning about school items and numbers! 🎓✨</p>
+            <p class="small text-muted">Made with ❤️ for Grade 2 students</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
